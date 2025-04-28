@@ -122,11 +122,20 @@ def transform_row(row_dict):
     }
 
 
-def convert_excel_to_csv(excel_path, csv_path):
-    print(f"📄 Converting Excel file to CSV for efficient chunking...")
-    df = pd.read_excel(excel_path, engine='openpyxl')
-    df.to_csv(csv_path, index=False)
-    print(f"✅ Conversion complete: {csv_path}")
+def convert_excel_to_csv(input_path, csv_output_path):
+    print(f"📄 Converting Excel to CSV: {input_path} -> {csv_output_path}")
+    df = pd.read_excel(input_path, engine='openpyxl')
+
+    # ✨ Filter out rows where 'Country Code' is 'CA'
+    if 'Country Code' in df.columns:
+        df = df[~df['Country Code'].astype(str).str.strip().str.upper().eq('CA')]
+        print(f"✅ Filtered out Canada (CA) rows. Remaining rows: {len(df)}")
+    else:
+        print("⚠️ Warning: 'Country Code' column not found. No filtering applied.")
+
+    df.to_csv(csv_output_path, index=False)
+    print(f"✅ Saved filtered CSV to {csv_output_path}")
+
 
 def process_large_csv(csv_path, output_path, chunk_size=10000):
     print(f"🚀 Starting processing of CSV file (chunk_size={chunk_size})")
